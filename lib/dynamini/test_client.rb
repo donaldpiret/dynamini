@@ -1,5 +1,9 @@
 require 'ostruct'
-require 'active_support/core_ext/hash/deep_dup'
+begin
+  require 'active_support/core_ext/object/deep_dup'
+rescue LoadError
+  require 'active_support/core_ext/hash/deep_dup'
+end
 
 module Dynamini
   # In-memory database client for test purposes.

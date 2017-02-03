@@ -24,6 +24,7 @@ module Dynamini
     end
 
     def add_to(attribute, value)
+      attribute = attribute.to_sym
       complain_about(attribute) unless self.class.handles[attribute]
       old_value = read_attribute(attribute)
       add_value = self.class.attribute_callback(TypeHandler::SETTER_PROCS,  self.class.handles[attribute], value, true)
@@ -37,6 +38,7 @@ module Dynamini
     end
 
     def delete_attribute(attribute)
+      attribute = attribute.to_sym
       if @attributes[attribute]
         old_value = read_attribute(attribute)
         record_change(attribute, old_value, DELETED_TOKEN, 'DELETE')
@@ -89,12 +91,14 @@ module Dynamini
     end
 
     def respond_to_missing?(name, include_private = false)
+      name = name.to_sym
       @attributes.keys.include?(name) || write_method?(name) || was_method?(name) || super
     end
 
     def write_attribute(attribute, new_value, change: true, **options)
+      attribute = attribute.to_sym
       old_value = read_attribute(attribute)
-      if (handle = self.class.handles[attribute.to_sym]) && !new_value.nil?
+      if (handle = self.class.handles[attribute]) && !new_value.nil?
         new_value = self.class.attribute_callback(TypeHandler::SETTER_PROCS, handle, new_value, change)
       end
       @attributes[attribute] = new_value
@@ -102,8 +106,9 @@ module Dynamini
     end
 
     def read_attribute(name)
+      name = name.to_sym
       value = @attributes[name]
-      if (handle = self.class.handles[name.to_sym])
+      if (handle = self.class.handles[name])
         value = handle[:options][:default] if value.nil?
         value = self.class.attribute_callback(TypeHandler::GETTER_PROCS, handle, value, false) unless value.nil?
       end
